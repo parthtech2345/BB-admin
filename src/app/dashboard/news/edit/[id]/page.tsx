@@ -333,8 +333,8 @@ export default function EditNewsPage({
     const safeAlt = (inlineImgAlt.trim() || safeCaption || title || 'Article image').replace(/"/g, '&quot;');
 
     const figureHtml = safeCaption
-      ? `<figure class="my-6 block"><img src="${safeUrl}" alt="${safeAlt}" class="rounded-md max-w-full h-auto mx-auto block shadow-xs" /><figcaption class="text-xs text-gray-500 italic text-center mt-2">${safeCaption}</figcaption></figure><p><br/></p>`
-      : `<figure class="my-6 block"><img src="${safeUrl}" alt="${safeAlt}" class="rounded-md max-w-full h-auto mx-auto block shadow-xs" /></figure><p><br/></p>`;
+      ? `<figure class="my-6 block text-center" style="margin: 1.5rem auto; text-align: center; max-width: 100%;"><img src="${safeUrl}" alt="${safeAlt}" class="max-w-full h-auto object-contain mx-auto block rounded-xl" style="max-height: 600px; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto;" /><figcaption class="text-xs text-gray-500 italic text-center mt-2">${safeCaption}</figcaption></figure><p><br/></p>`
+      : `<figure class="my-6 block text-center" style="margin: 1.5rem auto; text-align: center; max-width: 100%;"><img src="${safeUrl}" alt="${safeAlt}" class="max-w-full h-auto object-contain mx-auto block rounded-xl" style="max-height: 600px; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto;" /></figure><p><br/></p>`;
 
     if (isRawCodeMode) {
       setFullText((prev) => prev + '\n' + figureHtml);
@@ -1295,7 +1295,7 @@ export default function EditNewsPage({
                       setFullText(richEditorRef.current.innerHTML);
                     }
                   }}
-                  className="min-h-[280px] p-4 border border-gray-300 rounded-b-xl text-sm leading-relaxed text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0069f7] bg-white space-y-3"
+                  className="rich-text-editor min-h-[280px] p-4 border border-gray-300 rounded-b-xl text-sm leading-relaxed text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0069f7] bg-white space-y-3"
                   style={{ minHeight: '280px' }}
                 />
               )}
@@ -1400,9 +1400,13 @@ export default function EditNewsPage({
 
               {/* Preview if image URL exists */}
               {inlineImgUrl && (
-                <div className="relative aspect-video max-h-40 w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                <div className="relative w-full rounded-xl border border-gray-200 bg-gray-100 p-2 overflow-hidden flex items-center justify-center min-h-[140px]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={inlineImgUrl} alt="Preview" className="w-full h-full object-cover" />
+                  <img
+                    src={inlineImgUrl}
+                    alt="Preview"
+                    className="max-h-[280px] w-auto max-w-full object-contain mx-auto block rounded-lg shadow-xs"
+                  />
                 </div>
               )}
 

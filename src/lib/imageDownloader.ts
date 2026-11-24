@@ -2,14 +2,62 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-export async function downloadImageToUploads(imageUrl: string): Promise<string> {
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+export function getDualUploadDirs(): { adminDir: string; websiteDir: string } {
+  const adminDir = path.join(process.cwd(), 'public', 'uploads');
+  if (!fs.existsSync(adminDir)) {
+    fs.mkdirSync(adminDir, { recursive: true });
   }
 
-  // If already a local upload, return as is
+  // Dual-write target: BB-website/public/uploads
+  const websiteDir =
+    process.env.WEBSITE_UPLOADS_DIR ||
+    path.resolve(process.cwd(), '..', 'BB-website', 'public', 'uploads');
+
+  if (!fs.existsSync(websiteDir)) {
+    try {
+      fs.mkdirSync(websiteDir, { recursive: true });
+    } catch (e) {
+      console.warn('Could not create BB-website uploads directory:', e);
+    }
+  }
+
+  return { adminDir, websiteDir };
+}
+
+export function saveBufferToDualUploads(buffer: Buffer, filename: string): void {
+  const { adminDir, websiteDir } = getDualUploadDirs();
+
+  // 1. Write to admin uploads
+  const adminPath = path.join(adminDir, filename);
+  fs.writeFileSync(adminPath, buffer);
+
+  // 2. Dual-write to public website uploads
+  try {
+    if (fs.existsSync(websiteDir)) {
+      const websitePath = path.join(websiteDir, filename);
+      fs.writeFileSync(websitePath, buffer);
+    }
+  } catch (err) {
+    console.error('Error dual-writing image to BB-website uploads:', err);
+  }
+}
+
+export async function downloadImageToUploads(imageUrl: string): Promise<string> {
+  const { adminDir, websiteDir } = getDualUploadDirs();
+
+  // If already a local upload, ensure it exists in website uploads too
   if (imageUrl.startsWith('/uploads/')) {
+    const filename = path.basename(imageUrl);
+    const adminPath = path.join(adminDir, filename);
+    const websitePath = path.join(websiteDir, filename);
+
+    if (fs.existsSync(adminPath) && !fs.existsSync(websitePath)) {
+      try {
+        fs.copyFileSync(adminPath, websitePath);
+      } catch (err) {
+        console.warn('Could not sync existing upload to website uploads:', err);
+      }
+    }
     return imageUrl;
   }
 
@@ -19,8 +67,8 @@ export async function downloadImageToUploads(imageUrl: string): Promise<string> 
     if (fs.existsSync(sourceFilePath)) {
       const ext = path.extname(imageUrl) || '.jpg';
       const filename = `bb_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
-      const destPath = path.join(uploadsDir, filename);
-      fs.copyFileSync(sourceFilePath, destPath);
+      const buffer = fs.readFileSync(sourceFilePath);
+      saveBufferToDualUploads(buffer, filename);
       return `/uploads/${filename}`;
     }
   }
@@ -50,10 +98,9 @@ export async function downloadImageToUploads(imageUrl: string): Promise<string> 
       }
 
       const filename = `downloaded_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
-      const destPath = path.join(uploadsDir, filename);
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      fs.writeFileSync(destPath, buffer);
+      saveBufferToDualUploads(buffer, filename);
 
       return `/uploads/${filename}`;
     } catch (err) {
@@ -67,14 +114,8 @@ export async function downloadImageToUploads(imageUrl: string): Promise<string> 
 }
 
 export function saveBufferToUploads(buffer: Buffer, originalFilename: string): string {
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-
   const ext = path.extname(originalFilename) || '.jpg';
   const filename = `upload_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
-  const destPath = path.join(uploadsDir, filename);
-  fs.writeFileSync(destPath, buffer);
+  saveBufferToDualUploads(buffer, filename);
   return `/uploads/${filename}`;
 }

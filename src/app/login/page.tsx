@@ -6,8 +6,8 @@ import { Lock, Mail, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@businessbullet.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -92,7 +92,8 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="admin@businessbullet.com"
+                  placeholder="Enter administrator email"
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0069f7] focus:border-transparent transition"
                 />
               </div>
@@ -103,9 +104,6 @@ export default function LoginPage() {
                 <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
                   Password
                 </label>
-                <span className="text-[11px] text-[#0069f7] hover:underline cursor-pointer">
-                  Default: admin123
-                </span>
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
@@ -115,6 +113,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0069f7] focus:border-transparent transition"
                 />
               </div>

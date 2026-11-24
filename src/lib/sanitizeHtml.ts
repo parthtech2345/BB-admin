@@ -5,6 +5,8 @@
  * - Stripping foreign fonts, hardcoded font sizes, background colors, and style attributes
  * - Keeping clean semantic tags: <p>, <h2>, <h3>, <b>, <strong>, <i>, <em>, <a>, <ul>, <ol>, <li>, <blockquote>, <figure>, <img>, <figcaption>, <br>
  * - Normalizing text formatting and unwrapping unnecessary spans/divs
+ * - Auto-aligns & repairs images to full-fit (no-crop) standard:
+ *   max-height: 600px; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto;
  */
 
 const ALLOWED_TAGS = new Set([
@@ -62,7 +64,11 @@ export function cleanArticleHtml(html: string): string {
             if (src) el.setAttribute('src', src);
             if (alt) el.setAttribute('alt', alt);
             if (title) el.setAttribute('title', title);
-            el.setAttribute('class', 'rounded-md max-w-full h-auto mx-auto block shadow-xs');
+            el.setAttribute('class', 'max-w-full h-auto object-contain mx-auto block rounded-xl');
+            el.setAttribute(
+              'style',
+              'max-height: 600px; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto;'
+            );
           } else if (tagName === 'A') {
             const href = el.getAttribute('href') || '#';
             const title = el.getAttribute('title') || '';
@@ -71,8 +77,11 @@ export function cleanArticleHtml(html: string): string {
             if (title) el.setAttribute('title', title);
             el.setAttribute('target', '_blank');
             el.setAttribute('rel', 'noopener noreferrer');
-          } else if (tagName === 'FIGURE' || tagName === 'FIGCAPTION') {
-            // Keep clean figure / figcaption
+          } else if (tagName === 'FIGURE') {
+            el.setAttribute('class', 'my-6 block text-center');
+            el.setAttribute('style', 'margin: 1.5rem auto; text-align: center; max-width: 100%;');
+          } else if (tagName === 'FIGCAPTION') {
+            el.setAttribute('class', 'text-xs text-gray-500 italic text-center mt-2');
             el.removeAttribute('style');
           } else {
             // For P, H2, H3, B, STRONG, UL, OL, LI, BLOCKQUOTE, etc.
