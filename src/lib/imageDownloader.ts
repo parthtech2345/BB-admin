@@ -3,19 +3,23 @@ import path from 'path';
 import crypto from 'crypto';
 
 export function getDualUploadDirs(): { adminDir: string; websiteDir: string } {
-  const adminDir = path.join(process.cwd(), 'public', 'uploads');
-  if (!fs.existsSync(adminDir)) {
-    fs.mkdirSync(adminDir, { recursive: true });
+  const adminDir = path.join(/*turbopackIgnore: true*/ process.cwd(), 'public', 'uploads');
+  if (!fs.existsSync(/*turbopackIgnore: true*/ adminDir)) {
+    try {
+      fs.mkdirSync(/*turbopackIgnore: true*/ adminDir, { recursive: true });
+    } catch {
+      // directory exists or cannot create
+    }
   }
 
   // Dual-write target: BB-website/public/uploads
   const websiteDir =
     process.env.WEBSITE_UPLOADS_DIR ||
-    path.resolve(process.cwd(), '..', 'BB-website', 'public', 'uploads');
+    path.resolve(/*turbopackIgnore: true*/ process.cwd(), '..', 'BB-website', 'public', 'uploads');
 
-  if (!fs.existsSync(websiteDir)) {
+  if (!fs.existsSync(/*turbopackIgnore: true*/ websiteDir)) {
     try {
-      fs.mkdirSync(websiteDir, { recursive: true });
+      fs.mkdirSync(/*turbopackIgnore: true*/ websiteDir, { recursive: true });
     } catch (e) {
       console.warn('Could not create BB-website uploads directory:', e);
     }
@@ -28,14 +32,14 @@ export function saveBufferToDualUploads(buffer: Buffer, filename: string): void 
   const { adminDir, websiteDir } = getDualUploadDirs();
 
   // 1. Write to admin uploads
-  const adminPath = path.join(adminDir, filename);
-  fs.writeFileSync(adminPath, buffer);
+  const adminPath = path.join(/*turbopackIgnore: true*/ adminDir, filename);
+  fs.writeFileSync(/*turbopackIgnore: true*/ adminPath, buffer);
 
   // 2. Dual-write to public website uploads
   try {
-    if (fs.existsSync(websiteDir)) {
-      const websitePath = path.join(websiteDir, filename);
-      fs.writeFileSync(websitePath, buffer);
+    if (fs.existsSync(/*turbopackIgnore: true*/ websiteDir)) {
+      const websitePath = path.join(/*turbopackIgnore: true*/ websiteDir, filename);
+      fs.writeFileSync(/*turbopackIgnore: true*/ websitePath, buffer);
     }
   } catch (err) {
     console.error('Error dual-writing image to BB-website uploads:', err);
@@ -48,12 +52,12 @@ export async function downloadImageToUploads(imageUrl: string): Promise<string> 
   // If already a local upload, ensure it exists in website uploads too
   if (imageUrl.startsWith('/uploads/')) {
     const filename = path.basename(imageUrl);
-    const adminPath = path.join(adminDir, filename);
-    const websitePath = path.join(websiteDir, filename);
+    const adminPath = path.join(/*turbopackIgnore: true*/ adminDir, filename);
+    const websitePath = path.join(/*turbopackIgnore: true*/ websiteDir, filename);
 
-    if (fs.existsSync(adminPath) && !fs.existsSync(websitePath)) {
+    if (fs.existsSync(/*turbopackIgnore: true*/ adminPath) && !fs.existsSync(/*turbopackIgnore: true*/ websitePath)) {
       try {
-        fs.copyFileSync(adminPath, websitePath);
+        fs.copyFileSync(/*turbopackIgnore: true*/ adminPath, websitePath);
       } catch (err) {
         console.warn('Could not sync existing upload to website uploads:', err);
       }
@@ -63,11 +67,11 @@ export async function downloadImageToUploads(imageUrl: string): Promise<string> 
 
   // If it's a relative path from the main website (e.g., /images/news/markets_xyz.jpg)
   if (imageUrl.startsWith('/images/')) {
-    const sourceFilePath = path.join(process.cwd(), '..', 'BB-website', 'public', imageUrl);
-    if (fs.existsSync(sourceFilePath)) {
+    const sourceFilePath = path.join(/*turbopackIgnore: true*/ process.cwd(), '..', 'BB-website', 'public', imageUrl);
+    if (fs.existsSync(/*turbopackIgnore: true*/ sourceFilePath)) {
       const ext = path.extname(imageUrl) || '.jpg';
       const filename = `bb_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
-      const buffer = fs.readFileSync(sourceFilePath);
+      const buffer = fs.readFileSync(/*turbopackIgnore: true*/ sourceFilePath);
       saveBufferToDualUploads(buffer, filename);
       return `/uploads/${filename}`;
     }
