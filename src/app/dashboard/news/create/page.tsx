@@ -385,9 +385,9 @@ export default function CreateNewsPage() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:4036';
-    const canonical = `/news/${category || 'business'}/${cleanSlug}`;
-    const generatedMetaTitle = `${title.trim()} | BusinessBulletin`;
+    const publicSiteUrl = 'https://www.businessbulletin.in';
+    const canonical = `${publicSiteUrl}/article/${cleanSlug}`;
+    const generatedMetaTitle = title.trim();
     const generatedMetaDesc = summary ? summary.slice(0, 160) : title.slice(0, 160);
 
     const keywordsList = [
@@ -407,7 +407,7 @@ export default function CreateNewsPage() {
   "headline": ${JSON.stringify(title.trim())},
   "description": ${JSON.stringify(generatedMetaDesc)},
   "image": [
-    ${JSON.stringify(imageUrl || `${currentOrigin}/updatedlogo.svg`)}
+    ${JSON.stringify(imageUrl || `${publicSiteUrl}/updatedlogo.svg`)}
   ],
   "datePublished": "${new Date().toISOString()}",
   "author": [{
@@ -419,12 +419,12 @@ export default function CreateNewsPage() {
     "name": "BusinessBulletin",
     "logo": {
       "@type": "ImageObject",
-      "url": "${currentOrigin}/updatedlogo.svg"
+      "url": "${publicSiteUrl}/updatedlogo.svg"
     }
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "${currentOrigin}${canonical}"
+    "@id": ${JSON.stringify(canonical)}
   },
   "articleSection": ${JSON.stringify(categoryLabel || 'Business')}
 }

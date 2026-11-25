@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
           localImg = item.imageUrl;
         }
 
-        const generatedCanonical = `https://businessbulletin.com/article/${item.id}`;
+        const generatedCanonical = `https://www.businessbulletin.in/article/${item.id}`;
         const schema = {
           '@context': 'https://schema.org',
           '@type': 'NewsArticle',
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
           'publisher': {
             '@type': 'Organization',
             'name': 'BusinessBulletin',
-            'logo': { '@type': 'ImageObject', 'url': 'https://businessbulletin.com/updatedlogo.svg' },
+            'logo': { '@type': 'ImageObject', 'url': 'https://www.businessbulletin.in/updatedlogo.svg' },
           },
           'mainEntityOfPage': { '@type': 'WebPage', '@id': generatedCanonical },
           'articleSection': item.categoryLabel || item.category,

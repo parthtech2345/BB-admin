@@ -128,6 +128,7 @@ export async function POST(request: NextRequest) {
     // Dynamic Host Resolution for canonical and fallback URLs (works seamlessly across localhost & live production)
     const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:4036';
     const proto = host.includes('localhost') || host.includes('127.0.0.1') ? 'http' : 'https';
+    const publicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.businessbulletin.in';
     const siteUrl = `${proto}://${host}`;
 
     // Generate or format slug
@@ -155,7 +156,9 @@ export async function POST(request: NextRequest) {
     // Auto generate fallback SEO fields if empty
     const finalMetaTitle = metaTitle && metaTitle.trim() ? metaTitle.trim() : `${title.trim()} | BusinessBulletin`;
     const finalMetaDescription = metaDescription && metaDescription.trim() ? metaDescription.trim() : summary.trim().slice(0, 160);
-    const finalCanonicalUrl = canonicalUrl && canonicalUrl.trim() ? canonicalUrl.trim() : `${siteUrl}/article/${slug}`;
+    const finalCanonicalUrl = canonicalUrl && canonicalUrl.trim() && !canonicalUrl.includes('businessbulletin.com') && !canonicalUrl.startsWith('/news/')
+      ? canonicalUrl.trim()
+      : `${publicSiteUrl}/article/${slug}`;
 
     let finalSchemaMarkup = schemaMarkup;
     if (!finalSchemaMarkup || !finalSchemaMarkup.trim()) {

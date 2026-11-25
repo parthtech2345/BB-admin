@@ -10,7 +10,7 @@ export interface ArticleSchemaData {
 
 export function generateNewsArticleSchema(data: ArticleSchemaData): string {
   const publishedDate = data.pubDate ? new Date(data.pubDate).toISOString() : new Date().toISOString();
-  const canonical = data.canonicalUrl || 'https://businessbulletin.com';
+  const canonical = data.canonicalUrl || 'https://www.businessbulletin.in';
 
   const schema = {
     '@context': 'https://schema.org',
@@ -31,7 +31,7 @@ export function generateNewsArticleSchema(data: ArticleSchemaData): string {
       'name': 'BusinessBulletin',
       'logo': {
         '@type': 'ImageObject',
-        'url': 'https://businessbulletin.com/updatedlogo.svg',
+        'url': 'https://www.businessbulletin.in/updatedlogo.svg',
       },
     },
     'mainEntityOfPage': {
