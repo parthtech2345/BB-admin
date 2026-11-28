@@ -24,7 +24,19 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase();
     const body = await request.json();
-    const { name, slug, description, order, status, subCategories } = body;
+    const {
+      name,
+      slug,
+      description,
+      order,
+      status,
+      subCategories,
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      canonicalUrl,
+      schemaMarkup,
+    } = body;
 
     if (!name || !name.trim()) {
       return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
@@ -47,7 +59,29 @@ export async function POST(request: NextRequest) {
       description: description || '',
       order: Number(order) || 0,
       status: status || 'active',
-      subCategories: Array.isArray(subCategories) ? subCategories : [],
+      subCategories: Array.isArray(subCategories)
+        ? subCategories.map((sub: any) => ({
+            name: sub.name,
+            slug: (sub.slug || sub.name)
+              .toLowerCase()
+              .trim()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, ''),
+            description: sub.description || '',
+            order: Number(sub.order) || 0,
+            status: sub.status || 'active',
+            metaTitle: sub.metaTitle || '',
+            metaDescription: sub.metaDescription || '',
+            metaKeywords: sub.metaKeywords || '',
+            canonicalUrl: sub.canonicalUrl || '',
+            schemaMarkup: sub.schemaMarkup || '',
+          }))
+        : [],
+      metaTitle: metaTitle || '',
+      metaDescription: metaDescription || '',
+      metaKeywords: metaKeywords || '',
+      canonicalUrl: canonicalUrl || '',
+      schemaMarkup: schemaMarkup || '',
     });
 
     return NextResponse.json({ success: true, category: newCategory }, { status: 201 });

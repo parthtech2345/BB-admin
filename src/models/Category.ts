@@ -7,6 +7,11 @@ export interface ISubCategory {
   description?: string;
   order?: number;
   status: 'active' | 'inactive';
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  canonicalUrl?: string;
+  schemaMarkup?: string;
 }
 
 export interface ICategory extends Document {
@@ -16,6 +21,11 @@ export interface ICategory extends Document {
   order: number;
   status: 'active' | 'inactive';
   subCategories: ISubCategory[];
+  metaTitle?: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  canonicalUrl?: string;
+  schemaMarkup?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +37,11 @@ const SubCategorySchema = new Schema<ISubCategory>(
     description: { type: String, default: '' },
     order: { type: Number, default: 0 },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    metaTitle: { type: String, default: '' },
+    metaDescription: { type: String, default: '' },
+    metaKeywords: { type: String, default: '' },
+    canonicalUrl: { type: String, default: '' },
+    schemaMarkup: { type: String, default: '' },
   },
   { timestamps: true }
 );
@@ -39,6 +54,11 @@ const CategorySchema = new Schema<ICategory>(
     order: { type: Number, default: 0 },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     subCategories: [SubCategorySchema],
+    metaTitle: { type: String, default: '' },
+    metaDescription: { type: String, default: '' },
+    metaKeywords: { type: String, default: '' },
+    canonicalUrl: { type: String, default: '' },
+    schemaMarkup: { type: String, default: '' },
   },
   { timestamps: true }
 );

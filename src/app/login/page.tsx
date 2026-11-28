@@ -58,6 +58,7 @@ export default function LoginPage() {
                 src="/updatedlogo.svg"
                 alt="BusinessBulletin Logo"
                 className="h-10 w-auto brightness-0 invert object-contain"
+                style={{ height: '40px', width: 'auto', maxHeight: '40px' }}
               />
             </div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0069f7]/20 border border-[#0069f7]/40 text-[#4da2ff] text-[11px] font-semibold tracking-wider uppercase mb-1">

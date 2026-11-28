@@ -34,7 +34,19 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    const { name, slug, description, order, status, subCategories } = body;
+    const {
+      name,
+      slug,
+      description,
+      order,
+      status,
+      subCategories,
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      canonicalUrl,
+      schemaMarkup,
+    } = body;
 
     const category = await Category.findById(id);
     if (!category) {
@@ -52,8 +64,15 @@ export async function PUT(
     if (description !== undefined) category.description = description;
     if (order !== undefined) category.order = Number(order);
     if (status) category.status = status;
+    if (metaTitle !== undefined) category.metaTitle = metaTitle;
+    if (metaDescription !== undefined) category.metaDescription = metaDescription;
+    if (metaKeywords !== undefined) category.metaKeywords = metaKeywords;
+    if (canonicalUrl !== undefined) category.canonicalUrl = canonicalUrl;
+    if (schemaMarkup !== undefined) category.schemaMarkup = schemaMarkup;
+
     if (Array.isArray(subCategories)) {
       category.subCategories = subCategories.map((sub: any) => ({
+        _id: sub._id,
         name: sub.name,
         slug: (sub.slug || sub.name)
           .toLowerCase()
@@ -63,7 +82,12 @@ export async function PUT(
         description: sub.description || '',
         order: Number(sub.order) || 0,
         status: sub.status || 'active',
-      }));
+        metaTitle: sub.metaTitle || '',
+        metaDescription: sub.metaDescription || '',
+        metaKeywords: sub.metaKeywords || '',
+        canonicalUrl: sub.canonicalUrl || '',
+        schemaMarkup: sub.schemaMarkup || '',
+      })) as any;
     }
 
     await category.save();

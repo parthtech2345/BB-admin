@@ -19,11 +19,12 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       const userCount = await User.countDocuments();
-      if (userCount === 0 && email.toLowerCase() === 'admin@businessbullet.com') {
+      const normalizedEmail = email.toLowerCase();
+      if (userCount === 0 && (normalizedEmail === 'admin@businessbulletin.in' || normalizedEmail === 'admin@businessbullet.com')) {
         const passwordHash = await bcrypt.hash(password || 'admin123', 10);
         user = await User.create({
           name: 'Super Admin',
-          email: 'admin@businessbullet.com',
+          email: normalizedEmail,
           passwordHash,
           role: 'superadmin',
         });
